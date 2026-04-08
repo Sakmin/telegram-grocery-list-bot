@@ -36,7 +36,8 @@ When there are no active items but there are bought items:
 - keep `Пока ничего не добавлено.`
 - still render the bought block below it under `Куплено:`
 
-The active list itself is no longer rendered as plain text lines in the message body.
+Neither active items nor bought items are rendered as plain text lines in the message body.
+The text `Куплено:` is only a section label. The bought items themselves are rendered only as keyboard rows below it.
 
 ### Item Buttons
 
@@ -56,8 +57,8 @@ This keeps the item name attached to the action so the keyboard remains understa
 
 The item name shown inside the action button should be compact:
 - keep short names unchanged
-- truncate long names to 18 visible characters before the action suffix
-- use ellipsis when truncation happens
+- if the label part is longer than 18 Unicode characters, keep the first 17 characters and append `…`
+- the shortened label therefore has a maximum length of 18 characters including the ellipsis
 
 Only the keyboard label is shortened. The stored item text in the database is not changed.
 
