@@ -32,6 +32,10 @@ When there are no active items:
 When there are bought items:
 - add a short text separator: `Куплено:`
 
+When there are no active items but there are bought items:
+- keep `Пока ничего не добавлено.`
+- still render the bought block below it under `Куплено:`
+
 The active list itself is no longer rendered as plain text lines in the message body.
 
 ### Item Buttons
@@ -52,7 +56,7 @@ This keeps the item name attached to the action so the keyboard remains understa
 
 The item name shown inside the action button should be compact:
 - keep short names unchanged
-- truncate long names to roughly 18-20 visible characters before the action suffix
+- truncate long names to 18 visible characters before the action suffix
 - use ellipsis when truncation happens
 
 Only the keyboard label is shortened. The stored item text in the database is not changed.
