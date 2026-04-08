@@ -54,6 +54,7 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
     storage.initialize()
     service = GroceryListService(storage)
     item = service.add_item(group_id=10, text="Milk", created_by_user_id=7)
+    bread = service.add_item(group_id=10, text="Bread", created_by_user_id=7)
     service.save_list_message(
         group_id=10,
         message_chat_id=10,
@@ -68,9 +69,10 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
             EditListMessage(
                 chat_id=10,
                 message_id=99,
-                text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
+                text="Список покупок\n\nКуплено:",
                 reply_markup=[
                     [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                    [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
                     [("Очистить купленное", "clear_done")],
                 ],
             )
@@ -81,13 +83,15 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
 
     assert bot.sent_texts == ["Сообщение со списком было удалено, поэтому я отправил новое."]
     assert len(bot.posted_messages) == 1
-    assert bot.posted_messages[0].text == "Список покупок\nПока ничего не добавлено.\n\nКуплено:"
+    assert bot.posted_messages[0].text == "Список покупок\n\nКуплено:"
     assert [[button.text for button in row] for row in bot.posted_messages[0].reply_markup.inline_keyboard] == [
         [f"Milk · Вернуть", "Удалить"],
+        [f"Bread · Куплено", "Удалить"],
         ["Очистить купленное"],
     ]
     assert [[button.callback_data for button in row] for row in bot.posted_messages[0].reply_markup.inline_keyboard] == [
         [f"return:{item.item_id}", f"delete:{item.item_id}"],
+        [f"done:{bread.item_id}", f"delete:{bread.item_id}"],
         ["clear_done"],
     ]
     snapshot = service.get_snapshot(group_id=10)

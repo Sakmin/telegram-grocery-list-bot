@@ -127,6 +127,7 @@ def test_handle_list_edits_existing_list_message(tmp_path):
 
 def test_handle_callback_marks_item_done_and_refreshes_list(tmp_path):
     item = GroceryItem(item_id=1, group_id=10, text="Milk", created_by_user_id=7)
+    bread = GroceryItem(item_id=2, group_id=10, text="Bread", created_by_user_id=7)
     service = FakeService(
         group=GroupList(
             group_id=10,
@@ -134,7 +135,7 @@ def test_handle_callback_marks_item_done_and_refreshes_list(tmp_path):
             list_message_chat_id=10,
             is_pinned=True,
         ),
-        items=[item],
+        items=[item, bread],
     )
 
     result = handle_callback(
@@ -151,9 +152,10 @@ def test_handle_callback_marks_item_done_and_refreshes_list(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
+            text="Список покупок\n\nКуплено:",
             reply_markup=[
                 [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         )
@@ -278,6 +280,7 @@ def test_refresh_list_message_recovers_when_saved_message_is_missing(tmp_path):
 def test_handle_callback_repeated_done_is_idempotent(tmp_path):
     service = build_service(tmp_path)
     item = service.add_item(group_id=10, text="Milk", created_by_user_id=7)
+    bread = service.add_item(group_id=10, text="Bread", created_by_user_id=7)
     service.save_list_message(
         group_id=10,
         message_chat_id=10,
@@ -308,9 +311,10 @@ def test_handle_callback_repeated_done_is_idempotent(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
+            text="Список покупок\n\nКуплено:",
             reply_markup=[
                 [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         )
@@ -323,6 +327,7 @@ def test_handle_callback_repeated_done_is_idempotent(tmp_path):
 def test_handle_callback_recovers_when_saved_message_is_missing(tmp_path):
     service = build_service(tmp_path)
     item = service.add_item(group_id=10, text="Milk", created_by_user_id=7)
+    bread = service.add_item(group_id=10, text="Bread", created_by_user_id=7)
     service.save_list_message(
         group_id=10,
         message_chat_id=10,
@@ -348,9 +353,10 @@ def test_handle_callback_recovers_when_saved_message_is_missing(tmp_path):
         ),
         PostListMessage(
             chat_id=10,
-            text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
+            text="Список покупок\n\nКуплено:",
             reply_markup=[
                 [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         ),
