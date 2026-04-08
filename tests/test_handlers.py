@@ -94,7 +94,7 @@ def test_handle_start_posts_list_when_missing(tmp_path):
     assert result.actions == [
         PostListMessage(
             chat_id=10,
-            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n• Пока ничего не куплено.",
+            text="Список покупок\nПока ничего не добавлено.",
             reply_markup=[],
         )
     ]
@@ -119,7 +119,7 @@ def test_handle_list_edits_existing_list_message(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n• Пока ничего не куплено.",
+            text="Список покупок\nПока ничего не добавлено.",
             reply_markup=[],
         )
     ]
@@ -151,9 +151,9 @@ def test_handle_callback_marks_item_done_and_refreshes_list(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
+            text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
             reply_markup=[
-                [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         )
@@ -211,10 +211,10 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nНужно купить\n- Milk\n- Bread\n\nКуплено\n• Пока ничего не куплено.",
+            text="Список покупок",
             reply_markup=[
-                [("Куплено", f"done:{milk.item_id}"), ("Удалить", f"delete:{milk.item_id}")],
-                [("Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Milk · Куплено", f"done:{milk.item_id}"), ("Удалить", f"delete:{milk.item_id}")],
+                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -222,9 +222,9 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nНужно купить\n- Bread\n\nКуплено\n• Пока ничего не куплено.",
+            text="Список покупок",
             reply_markup=[
-                [("Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -232,9 +232,9 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nНужно купить\n- Bread\n\nКуплено\n• Пока ничего не куплено.",
+            text="Список покупок",
             reply_markup=[
-                [("Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -263,11 +263,11 @@ def test_refresh_list_message_recovers_when_saved_message_is_missing(tmp_path):
         ),
         PostListMessage(
             chat_id=10,
-            text="Список покупок\nНужно купить\n- Milk\n\nКуплено\n• Пока ничего не куплено.",
+            text="Список покупок",
             reply_markup=[
-                [("Куплено", f"done:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Milk · Куплено", f"done:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
             ],
-        )
+        ),
     ]
     snapshot = service.get_snapshot(group_id=10)
     assert snapshot.group.list_message_id is None
@@ -308,9 +308,9 @@ def test_handle_callback_repeated_done_is_idempotent(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
+            text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
             reply_markup=[
-                [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         )
@@ -348,9 +348,9 @@ def test_handle_callback_recovers_when_saved_message_is_missing(tmp_path):
         ),
         PostListMessage(
             chat_id=10,
-            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
+            text="Список покупок\nПока ничего не добавлено.\n\nКуплено:",
             reply_markup=[
-                [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         ),
