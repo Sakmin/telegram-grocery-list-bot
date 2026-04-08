@@ -52,7 +52,7 @@ def test_build_list_keyboard_truncates_long_labels_before_action_text():
     rows = keyboard.inline_keyboard
 
     assert len(rows) == 1
-    assert [button.text for button in rows[0]] == ["молоко Простоква… · Куплено", "Удалить"]
+    assert [button.text for button in rows[0]] == ["молоко Простокваш… · Куплено", "Удалить"]
     assert [button.callback_data for button in rows[0]] == ["done:1", "delete:1"]
 
 
