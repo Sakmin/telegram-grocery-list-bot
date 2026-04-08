@@ -24,6 +24,10 @@ def test_render_list_text_hides_item_names_in_mixed_state():
     assert render_list_text([ACTIVE_ITEM, DONE_ITEM]) == "Список покупок\nПока ничего не добавлено.\n\nКуплено:"
 
 
+def test_render_list_text_hides_item_names_in_active_only_state():
+    assert render_list_text([ACTIVE_ITEM]) == "Список покупок"
+
+
 def test_build_list_keyboard_puts_item_label_in_first_button_and_adds_clear_row():
     keyboard = build_list_keyboard([ACTIVE_ITEM, DONE_ITEM])
     rows = keyboard.inline_keyboard
