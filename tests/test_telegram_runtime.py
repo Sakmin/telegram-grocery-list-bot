@@ -68,10 +68,10 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
             EditListMessage(
                 chat_id=10,
                 message_id=99,
-                text="Need to buy\n- Nothing here yet.\n\nBought\n- Milk",
+                text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
                 reply_markup=[
-                    [("Return", f"return:{item.item_id}"), ("Delete", f"delete:{item.item_id}")],
-                    [("Clear bought", "clear_done")],
+                    [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                    [("Очистить купленное", "clear_done")],
                 ],
             )
         ]
@@ -79,9 +79,9 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
 
     await execute_handler_result(bot=bot, service=service, group_id=10, result=result)
 
-    assert bot.sent_texts == ["The grocery list message was deleted, so I posted a new one."]
+    assert bot.sent_texts == ["Сообщение со списком было удалено, поэтому я отправил новое."]
     assert len(bot.posted_messages) == 1
-    assert bot.posted_messages[0].text == "Need to buy\n- Nothing here yet.\n\nBought\n- Milk"
+    assert bot.posted_messages[0].text == "Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk"
     snapshot = service.get_snapshot(group_id=10)
     assert snapshot.group.list_message_id == 111
     assert snapshot.group.list_message_chat_id == 10

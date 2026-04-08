@@ -14,11 +14,11 @@ def test_render_list_text_separates_active_and_done_items():
         ),
     ]
 
-    assert render_list_text(items) == "Need to buy\n- Milk\n\nBought\n- Bread"
+    assert render_list_text(items) == "Список покупок\nНужно купить\n- Milk\n\nКуплено\n- Bread"
 
 
 def test_render_list_text_shows_empty_state_when_no_items():
-    assert render_list_text([]) == "Need to buy\n- Nothing here yet.\n\nBought\n- Nothing bought yet."
+    assert render_list_text([]) == "Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n• Пока ничего не куплено."
 
 
 def test_build_list_keyboard_exposes_item_and_global_actions():
@@ -36,11 +36,11 @@ def test_build_list_keyboard_exposes_item_and_global_actions():
     keyboard = build_list_keyboard(items)
     rows = keyboard.inline_keyboard
 
-    assert [button.text for button in rows[0]] == ["Bought", "Delete"]
+    assert [button.text for button in rows[0]] == ["Куплено", "Удалить"]
     assert [button.callback_data for button in rows[0]] == ["done:1", "delete:1"]
-    assert [button.text for button in rows[1]] == ["Return", "Delete"]
+    assert [button.text for button in rows[1]] == ["Вернуть", "Удалить"]
     assert [button.callback_data for button in rows[1]] == ["return:2", "delete:2"]
-    assert [button.text for button in rows[2]] == ["Clear bought"]
+    assert [button.text for button in rows[2]] == ["Очистить купленное"]
     assert [button.callback_data for button in rows[2]] == ["clear_done"]
 
 
@@ -53,5 +53,5 @@ def test_build_list_keyboard_omits_clear_bought_when_no_done_items():
     rows = keyboard.inline_keyboard
 
     assert len(rows) == 1
-    assert [button.text for button in rows[0]] == ["Bought", "Delete"]
+    assert [button.text for button in rows[0]] == ["Куплено", "Удалить"]
     assert [button.callback_data for button in rows[0]] == ["done:1", "delete:1"]

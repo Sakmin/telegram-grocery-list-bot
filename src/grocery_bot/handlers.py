@@ -8,9 +8,9 @@ from grocery_bot.service import (
     ItemNotFoundError,
 )
 
-GROUP_ONLY_TEXT = "This bot only works in group chats."
-RECOVERED_LIST_TEXT = "The grocery list message was deleted, so I posted a new one."
-STALE_ACTION_TEXT = "This action is no longer available."
+GROUP_ONLY_TEXT = "Этот бот работает только в группах."
+RECOVERED_LIST_TEXT = "Сообщение со списком было удалено, поэтому я отправил новое."
+STALE_ACTION_TEXT = "Это действие больше не доступно."
 GROUP_CHAT_TYPES = {"group", "supergroup"}
 ADD_COMMAND_PATTERN = re.compile(r"^/add(?:@\w+)?(?:\s+(.*))?$")
 

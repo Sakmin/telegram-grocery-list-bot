@@ -72,7 +72,7 @@ def test_handle_message_rejects_non_group_chat(tmp_path):
     )
 
     assert result.actions == [
-        SendTextMessage(chat_id=50, text="This bot only works in group chats.")
+        SendTextMessage(chat_id=50, text="Этот бот работает только в группах.")
     ]
 
 
@@ -94,7 +94,7 @@ def test_handle_start_posts_list_when_missing(tmp_path):
     assert result.actions == [
         PostListMessage(
             chat_id=10,
-            text="Need to buy\n- Nothing here yet.\n\nBought\n- Nothing bought yet.",
+            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n• Пока ничего не куплено.",
             reply_markup=[],
         )
     ]
@@ -119,7 +119,7 @@ def test_handle_list_edits_existing_list_message(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Need to buy\n- Nothing here yet.\n\nBought\n- Nothing bought yet.",
+            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n• Пока ничего не куплено.",
             reply_markup=[],
         )
     ]
@@ -151,10 +151,10 @@ def test_handle_callback_marks_item_done_and_refreshes_list(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Need to buy\n- Nothing here yet.\n\nBought\n- Milk",
+            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
             reply_markup=[
-                [("Return", f"return:{item.item_id}"), ("Delete", f"delete:{item.item_id}")],
-                [("Clear bought", "clear_done")],
+                [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [("Очистить купленное", "clear_done")],
             ],
         )
     ]
@@ -211,10 +211,10 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Need to buy\n- Milk\n- Bread\n\nBought\n- Nothing bought yet.",
+            text="Список покупок\nНужно купить\n- Milk\n- Bread\n\nКуплено\n• Пока ничего не куплено.",
             reply_markup=[
-                [("Bought", f"done:{milk.item_id}"), ("Delete", f"delete:{milk.item_id}")],
-                [("Bought", f"done:{bread.item_id}"), ("Delete", f"delete:{bread.item_id}")],
+                [("Куплено", f"done:{milk.item_id}"), ("Удалить", f"delete:{milk.item_id}")],
+                [("Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -222,9 +222,9 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Need to buy\n- Bread\n\nBought\n- Nothing bought yet.",
+            text="Список покупок\nНужно купить\n- Bread\n\nКуплено\n• Пока ничего не куплено.",
             reply_markup=[
-                [("Bought", f"done:{bread.item_id}"), ("Delete", f"delete:{bread.item_id}")],
+                [("Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -232,9 +232,9 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Need to buy\n- Bread\n\nBought\n- Nothing bought yet.",
+            text="Список покупок\nНужно купить\n- Bread\n\nКуплено\n• Пока ничего не куплено.",
             reply_markup=[
-                [("Bought", f"done:{bread.item_id}"), ("Delete", f"delete:{bread.item_id}")],
+                [("Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -259,13 +259,13 @@ def test_refresh_list_message_recovers_when_saved_message_is_missing(tmp_path):
     assert result.actions == [
         SendTextMessage(
             chat_id=10,
-            text="The grocery list message was deleted, so I posted a new one.",
+            text="Сообщение со списком было удалено, поэтому я отправил новое.",
         ),
         PostListMessage(
             chat_id=10,
-            text="Need to buy\n- Milk\n\nBought\n- Nothing bought yet.",
+            text="Список покупок\nНужно купить\n- Milk\n\nКуплено\n• Пока ничего не куплено.",
             reply_markup=[
-                [("Bought", f"done:{item.item_id}"), ("Delete", f"delete:{item.item_id}")],
+                [("Куплено", f"done:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
             ],
         )
     ]
@@ -308,15 +308,15 @@ def test_handle_callback_repeated_done_is_idempotent(tmp_path):
         EditListMessage(
             chat_id=10,
             message_id=99,
-            text="Need to buy\n- Nothing here yet.\n\nBought\n- Milk",
+            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
             reply_markup=[
-                [("Return", f"return:{item.item_id}"), ("Delete", f"delete:{item.item_id}")],
-                [("Clear bought", "clear_done")],
+                [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [("Очистить купленное", "clear_done")],
             ],
         )
     ]
     assert second_result.actions == [
-        SendTextMessage(chat_id=10, text="This action is no longer available.")
+        SendTextMessage(chat_id=10, text="Это действие больше не доступно.")
     ]
 
 
@@ -344,14 +344,14 @@ def test_handle_callback_recovers_when_saved_message_is_missing(tmp_path):
     assert result.actions == [
         SendTextMessage(
             chat_id=10,
-            text="The grocery list message was deleted, so I posted a new one.",
+            text="Сообщение со списком было удалено, поэтому я отправил новое.",
         ),
         PostListMessage(
             chat_id=10,
-            text="Need to buy\n- Nothing here yet.\n\nBought\n- Milk",
+            text="Список покупок\nНужно купить\n• Пока пусто.\n\nКуплено\n- Milk",
             reply_markup=[
-                [("Return", f"return:{item.item_id}"), ("Delete", f"delete:{item.item_id}")],
-                [("Clear bought", "clear_done")],
+                [("Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [("Очистить купленное", "clear_done")],
             ],
         ),
     ]
@@ -375,7 +375,7 @@ def test_handle_callback_returns_benign_message_for_malformed_payload():
     )
 
     assert result.actions == [
-        SendTextMessage(chat_id=10, text="This action is no longer available.")
+        SendTextMessage(chat_id=10, text="Это действие больше не доступно.")
     ]
 
 
@@ -393,7 +393,7 @@ def test_handle_callback_returns_benign_message_for_stale_well_formed_payload():
     )
 
     assert result.actions == [
-        SendTextMessage(chat_id=10, text="This action is no longer available.")
+        SendTextMessage(chat_id=10, text="Это действие больше не доступно.")
     ]
 
 
