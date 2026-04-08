@@ -20,6 +20,7 @@ from grocery_bot.service import (
     ItemNotFoundError,
 )
 from grocery_bot.storage import SQLiteStorage
+from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler
 
 
 def test_build_application_returns_application_instance(tmp_path, monkeypatch):
@@ -40,11 +41,11 @@ def test_build_application_returns_application_instance(tmp_path, monkeypatch):
         "message",
         "callback",
     ]
-    assert [handler.callback for handler in app.handlers] == [
-        handle_start,
-        handle_list,
-        handle_message,
-        handle_callback,
+    assert [type(handler.handler) for handler in app.handlers] == [
+        CommandHandler,
+        CommandHandler,
+        MessageHandler,
+        CallbackQueryHandler,
     ]
     assert app.service.get_snapshot(group_id=10).group.group_id == 10
 

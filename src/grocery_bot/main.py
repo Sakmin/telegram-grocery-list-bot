@@ -1,56 +1,47 @@
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 import os
 
+from telegram.ext import Application, ApplicationBuilder
+
 from grocery_bot.config import BotConfig, load_config
-from grocery_bot.handlers import (
-    HandlerRequest,
-    HandlerResult,
-    handle_callback,
-    handle_list,
-    handle_message,
-    handle_start,
-)
 from grocery_bot.service import GroceryListService
 from grocery_bot.storage import SQLiteStorage
-
-HandlerCallable = Callable[[GroceryListService, HandlerRequest], HandlerResult]
+from grocery_bot.telegram_runtime import (
+    TelegramHandlerRegistration,
+    build_telegram_handlers,
+    register_telegram_handlers,
+)
 DEFAULT_LOCAL_BOT_TOKEN = "local-development-token"
+VALIDATE_ONLY_ENV = "GROCERY_BOT_VALIDATE_ONLY"
 
 
 @dataclass(slots=True, frozen=True)
-class RegisteredHandler:
-    name: str
-    trigger: str
-    callback: HandlerCallable
-
-
-@dataclass(slots=True)
-class LocalApplication:
+class RuntimeApplication:
     config: BotConfig
     storage: SQLiteStorage
     service: GroceryListService
-    handlers: tuple[RegisteredHandler, ...]
-    database_initialized: bool = False
-
-    def initialize(self) -> None:
-        self.storage.initialize()
-        self.database_initialized = True
+    telegram_application: Application
+    handlers: tuple[TelegramHandlerRegistration, ...]
+    database_initialized: bool
 
 
-def build_application() -> LocalApplication:
+def build_application() -> RuntimeApplication:
     config = _load_application_config()
     storage = SQLiteStorage(config.database_path)
+    storage.initialize()
     service = GroceryListService(storage)
-    application = LocalApplication(
+    telegram_application = ApplicationBuilder().token(config.bot_token).build()
+    handlers = build_telegram_handlers(service)
+    register_telegram_handlers(telegram_application, handlers)
+    return RuntimeApplication(
         config=config,
         storage=storage,
         service=service,
-        handlers=_build_handlers(),
+        telegram_application=telegram_application,
+        handlers=handlers,
+        database_initialized=True,
     )
-    application.initialize()
-    return application
 
 
 def main() -> int:
@@ -61,17 +52,12 @@ def main() -> int:
     print(f"Database initialized: {application.database_initialized}")
     print(f"Database path: {application.config.database_path}")
     print(f"Registered handlers: {route_names}")
-    print("Telegram transport wiring is represented locally in this environment.")
+    if os.getenv(VALIDATE_ONLY_ENV) == "1":
+        print("Validate-only mode enabled. Skipping Telegram polling.")
+        return 0
+    print("Starting Telegram polling.")
+    application.telegram_application.run_polling()
     return 0
-
-
-def _build_handlers() -> tuple[RegisteredHandler, ...]:
-    return (
-        RegisteredHandler(name="start", trigger="/start", callback=handle_start),
-        RegisteredHandler(name="list", trigger="/list", callback=handle_list),
-        RegisteredHandler(name="message", trigger="group text message", callback=handle_message),
-        RegisteredHandler(name="callback", trigger="inline button callback", callback=handle_callback),
-    )
 
 
 def _load_application_config() -> BotConfig:
