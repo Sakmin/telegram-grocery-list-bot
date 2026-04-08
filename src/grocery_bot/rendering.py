@@ -20,7 +20,7 @@ def render_list_text(items: list[GroceryItem]) -> str:
 
     lines = ["Список покупок"]
 
-    if not active_items or done_items:
+    if not active_items:
         lines.append("Пока ничего не добавлено.")
 
     if done_items:

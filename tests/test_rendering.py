@@ -21,7 +21,7 @@ def test_render_list_text_shows_short_bought_section_when_only_done_items():
 
 
 def test_render_list_text_hides_item_names_in_mixed_state():
-    assert render_list_text([ACTIVE_ITEM, DONE_ITEM]) == "Список покупок\nПока ничего не добавлено.\n\nКуплено:"
+    assert render_list_text([ACTIVE_ITEM, DONE_ITEM]) == "Список покупок\n\nКуплено:"
 
 
 def test_render_list_text_hides_item_names_in_active_only_state():
