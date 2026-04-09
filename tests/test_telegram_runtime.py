@@ -71,8 +71,8 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
                 message_id=99,
                 text="Список покупок\n\nКуплено:",
                 reply_markup=[
-                    [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
-                    [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                    [(f"Milk · 🔙", f"return:{item.item_id}"), ("❌", f"delete:{item.item_id}")],
+                    [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
                     [("Очистить купленное", "clear_done")],
                 ],
             )
@@ -85,8 +85,8 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
     assert len(bot.posted_messages) == 1
     assert bot.posted_messages[0].text == "Список покупок\n\nКуплено:"
     assert [[button.text for button in row] for row in bot.posted_messages[0].reply_markup.inline_keyboard] == [
-        [f"Milk · Вернуть", "Удалить"],
-        [f"Bread · Куплено", "Удалить"],
+        [f"Milk · 🔙", "❌"],
+        [f"Bread · ✅", "❌"],
         ["Очистить купленное"],
     ]
     assert [[button.callback_data for button in row] for row in bot.posted_messages[0].reply_markup.inline_keyboard] == [

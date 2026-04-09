@@ -32,9 +32,9 @@ def test_build_list_keyboard_puts_item_label_in_first_button_and_adds_clear_row(
     keyboard = build_list_keyboard([ACTIVE_ITEM, DONE_ITEM])
     rows = keyboard.inline_keyboard
 
-    assert [button.text for button in rows[0]] == ["Milk · Куплено", "Удалить"]
+    assert [button.text for button in rows[0]] == ["Milk · ✅", "❌"]
     assert [button.callback_data for button in rows[0]] == ["done:1", "delete:1"]
-    assert [button.text for button in rows[1]] == ["Bread · Вернуть", "Удалить"]
+    assert [button.text for button in rows[1]] == ["Bread · 🔙", "❌"]
     assert [button.callback_data for button in rows[1]] == ["return:2", "delete:2"]
     assert [button.text for button in rows[2]] == ["Очистить купленное"]
     assert [button.callback_data for button in rows[2]] == ["clear_done"]
@@ -52,7 +52,7 @@ def test_build_list_keyboard_truncates_long_labels_before_action_text():
     rows = keyboard.inline_keyboard
 
     assert len(rows) == 1
-    assert [button.text for button in rows[0]] == ["молоко Простокваш… · Куплено", "Удалить"]
+    assert [button.text for button in rows[0]] == ["молоко Простокваш… · ✅", "❌"]
     assert [button.callback_data for button in rows[0]] == ["done:1", "delete:1"]
 
 
@@ -61,7 +61,7 @@ def test_build_list_keyboard_omits_clear_bought_when_no_done_items():
     rows = keyboard.inline_keyboard
 
     assert len(rows) == 1
-    assert [button.text for button in rows[0]] == ["Milk · Куплено", "Удалить"]
+    assert [button.text for button in rows[0]] == ["Milk · ✅", "❌"]
     assert [button.callback_data for button in rows[0]] == ["done:1", "delete:1"]
 
 
@@ -85,5 +85,5 @@ def test_build_list_keyboard_truncates_labels_at_the_18_character_boundary():
 
     rows = keyboard.inline_keyboard
 
-    assert [button.text for button in rows[0]] == ["123456789012345678 · Куплено", "Удалить"]
-    assert [button.text for button in rows[1]] == ["12345678901234567… · Куплено", "Удалить"]
+    assert [button.text for button in rows[0]] == ["123456789012345678 · ✅", "❌"]
+    assert [button.text for button in rows[1]] == ["12345678901234567… · ✅", "❌"]

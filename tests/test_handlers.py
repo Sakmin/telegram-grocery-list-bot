@@ -155,8 +155,8 @@ def test_handle_callback_marks_item_done_and_refreshes_list(tmp_path):
             message_id=99,
             text="Список покупок\n\nКуплено:",
             reply_markup=[
-                [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
-                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Milk · 🔙", f"return:{item.item_id}"), ("❌", f"delete:{item.item_id}")],
+                [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         )
@@ -216,8 +216,8 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
             message_id=99,
             text="Список покупок",
             reply_markup=[
-                [(f"Milk · Куплено", f"done:{milk.item_id}"), ("Удалить", f"delete:{milk.item_id}")],
-                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Milk · ✅", f"done:{milk.item_id}"), ("❌", f"delete:{milk.item_id}")],
+                [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -227,7 +227,7 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
             message_id=99,
             text="Список покупок",
             reply_markup=[
-                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Bread · 🔙", f"return:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -237,7 +237,7 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
             message_id=99,
             text="Список покупок",
             reply_markup=[
-                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Milk · ✅", f"done:{milk.item_id}"), ("❌", f"delete:{milk.item_id}")],
             ],
         )
     ]
@@ -268,7 +268,7 @@ def test_refresh_list_message_recovers_when_saved_message_is_missing(tmp_path):
             chat_id=10,
             text="Список покупок",
             reply_markup=[
-                [(f"Milk · Куплено", f"done:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
+                [(f"Milk · ✅", f"done:{item.item_id}"), ("❌", f"delete:{item.item_id}")],
             ],
         ),
     ]
@@ -314,8 +314,8 @@ def test_handle_callback_repeated_done_is_idempotent(tmp_path):
             message_id=99,
             text="Список покупок\n\nКуплено:",
             reply_markup=[
-                [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
-                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Milk · 🔙", f"return:{item.item_id}"), ("❌", f"delete:{item.item_id}")],
+                [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         )
@@ -356,8 +356,8 @@ def test_handle_callback_recovers_when_saved_message_is_missing(tmp_path):
             chat_id=10,
             text="Список покупок\n\nКуплено:",
             reply_markup=[
-                [(f"Milk · Вернуть", f"return:{item.item_id}"), ("Удалить", f"delete:{item.item_id}")],
-                [(f"Bread · Куплено", f"done:{bread.item_id}"), ("Удалить", f"delete:{bread.item_id}")],
+                [(f"Milk · 🔙", f"return:{item.item_id}"), ("❌", f"delete:{item.item_id}")],
+                [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
                 [("Очистить купленное", "clear_done")],
             ],
         ),
