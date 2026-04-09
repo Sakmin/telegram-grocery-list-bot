@@ -40,13 +40,13 @@ def _build_item_row(item: GroceryItem) -> list[InlineKeyboardButton]:
     label = _short_item_label(item.text)
     if item.status == GroceryItemStatus.DONE:
         return [
-            InlineKeyboardButton(text=f"{label} · Вернуть", callback_data=f"return:{item.item_id}"),
-            InlineKeyboardButton(text="Удалить", callback_data=f"delete:{item.item_id}"),
+            InlineKeyboardButton(text=f"{label} · 🔙", callback_data=f"return:{item.item_id}"),
+            InlineKeyboardButton(text="❌", callback_data=f"delete:{item.item_id}"),
         ]
 
     return [
-        InlineKeyboardButton(text=f"{label} · Куплено", callback_data=f"done:{item.item_id}"),
-        InlineKeyboardButton(text="Удалить", callback_data=f"delete:{item.item_id}"),
+        InlineKeyboardButton(text=f"{label} · ✅", callback_data=f"done:{item.item_id}"),
+        InlineKeyboardButton(text="❌", callback_data=f"delete:{item.item_id}"),
     ]
 
 

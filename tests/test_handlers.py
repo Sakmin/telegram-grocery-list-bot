@@ -227,7 +227,7 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
             message_id=99,
             text="Список покупок",
             reply_markup=[
-                [(f"Bread · 🔙", f"return:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
+                [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
             ],
         )
     ]
@@ -237,7 +237,7 @@ def test_handle_callback_can_return_delete_and_clear_done_items(tmp_path):
             message_id=99,
             text="Список покупок",
             reply_markup=[
-                [(f"Milk · ✅", f"done:{milk.item_id}"), ("❌", f"delete:{milk.item_id}")],
+                [(f"Bread · ✅", f"done:{bread.item_id}"), ("❌", f"delete:{bread.item_id}")],
             ],
         )
     ]
