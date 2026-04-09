@@ -38,6 +38,11 @@ class SendTextMessage:
 
 
 @dataclass(slots=True, frozen=True)
+class AnswerCallback:
+    text: str | None = None
+
+
+@dataclass(slots=True, frozen=True)
 class PostListMessage:
     chat_id: int
     text: str
@@ -54,7 +59,7 @@ class EditListMessage:
 
 @dataclass(slots=True, frozen=True)
 class HandlerResult:
-    actions: list[SendTextMessage | PostListMessage | EditListMessage] = field(
+    actions: list[SendTextMessage | AnswerCallback | PostListMessage | EditListMessage] = field(
         default_factory=list
     )
 
@@ -132,9 +137,7 @@ def handle_callback(service: GroceryListService, request: HandlerRequest) -> Han
     try:
         action = parse_callback_data(request.callback_data or "")
     except ValueError:
-        return HandlerResult(
-            actions=[SendTextMessage(chat_id=request.chat_id, text=STALE_ACTION_TEXT)]
-        )
+        return HandlerResult(actions=[AnswerCallback(text=STALE_ACTION_TEXT)])
 
     try:
         if action.name == "done":
@@ -156,9 +159,7 @@ def handle_callback(service: GroceryListService, request: HandlerRequest) -> Han
         elif action.name == "clear_done":
             service.clear_done_items(group_id=request.chat_id)
     except (InvalidItemOperationError, ItemNotFoundError):
-        return HandlerResult(
-            actions=[SendTextMessage(chat_id=request.chat_id, text=STALE_ACTION_TEXT)]
-        )
+        return HandlerResult(actions=[AnswerCallback(text=STALE_ACTION_TEXT)])
 
     return refresh_list_message(
         service=service,

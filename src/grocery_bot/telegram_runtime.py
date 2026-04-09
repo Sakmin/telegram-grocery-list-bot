@@ -13,6 +13,7 @@ from telegram.ext import (
 )
 
 from grocery_bot.handlers import (
+    AnswerCallback,
     EditListMessage,
     HandlerRequest,
     HandlerResult,
@@ -67,16 +68,18 @@ def build_telegram_handlers(service: GroceryListService) -> tuple[TelegramHandle
     async def on_callback(update: Update, context: CallbackContext) -> None:
         callback_query = update.callback_query
         request = _request_from_update(update)
+        answered_callback = False
         try:
             result = handle_callback(service=service, request=request)
-            await execute_handler_result(
+            answered_callback = await execute_handler_result(
                 bot=context.bot,
                 service=service,
                 group_id=update.effective_chat.id,
                 result=result,
+                callback_query=callback_query,
             )
         finally:
-            if callback_query is not None:
+            if callback_query is not None and not answered_callback:
                 await callback_query.answer()
 
     return (
@@ -112,9 +115,15 @@ async def execute_handler_result(
     service: GroceryListService,
     group_id: int,
     result: HandlerResult,
-) -> None:
+    callback_query=None,
+) -> bool:
+    answered_callback = False
     for action in result.actions:
-        if isinstance(action, SendTextMessage):
+        if isinstance(action, AnswerCallback):
+            if callback_query is not None:
+                await callback_query.answer(text=action.text)
+                answered_callback = True
+        elif isinstance(action, SendTextMessage):
             await bot.send_message(chat_id=action.chat_id, text=action.text)
         elif isinstance(action, PostListMessage):
             message = await bot.send_message(
@@ -142,6 +151,8 @@ async def execute_handler_result(
                     reply_markup=_build_reply_markup(action.reply_markup),
                 )
             except BadRequest as error:
+                if _is_not_modified_error(error):
+                    continue
                 if not _is_missing_message_error(error):
                     raise
                 recovery_result = refresh_list_message(
@@ -154,7 +165,9 @@ async def execute_handler_result(
                     service=service,
                     group_id=group_id,
                     result=recovery_result,
+                    callback_query=callback_query,
                 )
+    return answered_callback
 
 
 def _request_from_update(update: Update) -> HandlerRequest:
@@ -199,3 +212,6 @@ def _is_missing_message_error(error: BadRequest) -> bool:
     message = str(error).casefold()
     return "message to edit not found" in message or "message_id_invalid" in message
 
+
+def _is_not_modified_error(error: BadRequest) -> bool:
+    return "message is not modified" in str(error).casefold()

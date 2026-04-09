@@ -5,7 +5,7 @@ import pytest
 from telegram.error import BadRequest
 from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler
 
-from grocery_bot.handlers import EditListMessage, HandlerResult
+from grocery_bot.handlers import AnswerCallback, EditListMessage, HandlerResult
 from grocery_bot.main import RuntimeApplication, build_application, main
 from grocery_bot.service import GroceryListService
 from grocery_bot.storage import SQLiteStorage
@@ -100,6 +100,58 @@ async def test_execute_handler_result_recovers_from_missing_message(tmp_path):
     assert snapshot.group.is_pinned is True
 
 
+@pytest.mark.anyio
+async def test_execute_handler_result_ignores_message_not_modified(tmp_path):
+    storage = SQLiteStorage(tmp_path / "runtime.sqlite3")
+    storage.initialize()
+    service = GroceryListService(storage)
+    service.save_list_message(
+        group_id=10,
+        message_chat_id=10,
+        message_id=99,
+        is_pinned=True,
+    )
+
+    bot = FakeBot(not_modified_message_ids={99}, new_message_id=111)
+    result = HandlerResult(
+        actions=[
+            EditListMessage(
+                chat_id=10,
+                message_id=99,
+                text="Список покупок",
+                reply_markup=[],
+            )
+        ]
+    )
+
+    await execute_handler_result(bot=bot, service=service, group_id=10, result=result)
+
+    assert bot.sent_texts == []
+    assert bot.posted_messages == []
+
+
+@pytest.mark.anyio
+async def test_execute_handler_result_answers_callback_without_posting_to_chat(tmp_path):
+    storage = SQLiteStorage(tmp_path / "runtime.sqlite3")
+    storage.initialize()
+    service = GroceryListService(storage)
+    bot = FakeBot(new_message_id=111)
+    callback_query = FakeCallbackQuery()
+    result = HandlerResult(actions=[AnswerCallback(text="Это действие больше не доступно.")])
+
+    answered = await execute_handler_result(
+        bot=bot,
+        service=service,
+        group_id=10,
+        result=result,
+        callback_query=callback_query,
+    )
+
+    assert answered is True
+    assert bot.sent_texts == []
+    assert callback_query.answers == [{"text": "Это действие больше не доступно."}]
+
+
 @dataclass
 class FakePostedMessage:
     chat_id: int
@@ -109,8 +161,14 @@ class FakePostedMessage:
 
 
 class FakeBot:
-    def __init__(self, missing_message_ids: set[int], new_message_id: int):
-        self.missing_message_ids = missing_message_ids
+    def __init__(
+        self,
+        missing_message_ids: set[int] | None = None,
+        not_modified_message_ids: set[int] | None = None,
+        new_message_id: int = 0,
+    ):
+        self.missing_message_ids = missing_message_ids or set()
+        self.not_modified_message_ids = not_modified_message_ids or set()
         self.new_message_id = new_message_id
         self.sent_texts: list[str] = []
         self.posted_messages: list[FakePostedMessage] = []
@@ -133,6 +191,8 @@ class FakeBot:
     async def edit_message_text(self, chat_id: int, message_id: int, text: str, reply_markup=None):
         if message_id in self.missing_message_ids:
             raise BadRequest("Message to edit not found")
+        if message_id in self.not_modified_message_ids:
+            raise BadRequest("Message is not modified")
         return SimpleNamespace(chat_id=chat_id, message_id=message_id, text=text, reply_markup=reply_markup)
 
     async def pin_chat_message(self, chat_id: int, message_id: int, disable_notification: bool = True):
@@ -145,3 +205,11 @@ class FakeTelegramApplication:
 
     def run_polling(self):
         self.run_polling_calls += 1
+
+
+class FakeCallbackQuery:
+    def __init__(self):
+        self.answers: list[dict[str, str | None]] = []
+
+    async def answer(self, text: str | None = None):
+        self.answers.append({"text": text})

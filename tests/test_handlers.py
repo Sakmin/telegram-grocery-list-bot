@@ -1,5 +1,6 @@
 from grocery_bot.main import build_application
 from grocery_bot.handlers import (
+    AnswerCallback,
     CallbackAction,
     EditListMessage,
     HandlerRequest,
@@ -320,7 +321,7 @@ def test_handle_callback_repeated_done_is_idempotent(tmp_path):
         )
     ]
     assert second_result.actions == [
-        SendTextMessage(chat_id=10, text="Это действие больше не доступно.")
+        AnswerCallback(text="Это действие больше не доступно.")
     ]
 
 
@@ -381,7 +382,7 @@ def test_handle_callback_returns_benign_message_for_malformed_payload():
     )
 
     assert result.actions == [
-        SendTextMessage(chat_id=10, text="Это действие больше не доступно.")
+        AnswerCallback(text="Это действие больше не доступно.")
     ]
 
 
@@ -399,7 +400,7 @@ def test_handle_callback_returns_benign_message_for_stale_well_formed_payload():
     )
 
     assert result.actions == [
-        SendTextMessage(chat_id=10, text="Это действие больше не доступно.")
+        AnswerCallback(text="Это действие больше не доступно.")
     ]
 
 
